@@ -1,4 +1,4 @@
-package create;
+package create.prototype;
 
 public class Prototype {
 }
