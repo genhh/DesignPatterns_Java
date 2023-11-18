@@ -5,9 +5,20 @@ import create.abstract_factory.impl.FastFactory;
 
 import create.builder.Builder;
 import create.factory.NumberFactory;
+import create.prototype.Prototype;
+import create.singleton.Singleton;
+import structer.adapter.TaskCallable;
+import structer.adapter.TaskRunnableAdapter;
+import structer.bridge.BossCar;
+import structer.bridge.Car;
+import structer.bridge.impl.HybridEngine;
+import structer.composite.Composite;
+import structer.composite.Node;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -35,5 +46,36 @@ public class Main {
 
         //builder模式，将大型对象拆分成多个builder进行组装
         Builder builder = new Builder();
+
+        //Prototype
+        Prototype demo = new Prototype(1,2);
+        Prototype demo2 = demo.copy();
+        demo.setter(3,4);
+        demo.show();
+        demo2.show();
+
+        //Singleton
+        Singleton instance1 = Singleton.getInstance();
+        Singleton instance2 = Singleton.getInstance();
+        System.out.println(instance2.equals(instance1));
+
+        //Adapter
+        Callable<Long> callable = new TaskCallable();
+        Thread thread = new Thread(new TaskRunnableAdapter(callable));
+        thread.start();
+
+        //bridge
+        Car car = new BossCar(new HybridEngine());
+        car.drive();
+
+        //composite
+        Node root = new Composite("A");
+        root.addNode(new Composite("B").addNode(new Composite("c")));
+        //举例有点bug,懒得改了,大致意思就是展示组合的层级形式
+        while (root.children().size()>0){
+            System.out.println(root.getText());
+            root = root.children().get(0);
+        }
+
     }
 }
