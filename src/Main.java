@@ -7,6 +7,7 @@ import create.builder.Builder;
 import create.factory.NumberFactory;
 import create.prototype.Prototype;
 import create.singleton.Singleton;
+import org.w3c.dom.Text;
 import structer.adapter.TaskCallable;
 import structer.adapter.TaskRunnableAdapter;
 import structer.bridge.BossCar;
@@ -14,6 +15,14 @@ import structer.bridge.Car;
 import structer.bridge.impl.HybridEngine;
 import structer.composite.Composite;
 import structer.composite.Node;
+import structer.decorator.TextNode;
+import structer.decorator.impl.BoldDecorator;
+import structer.decorator.impl.SpanNode;
+import structer.facade.Facade;
+import structer.flyweight.Student;
+import structer.proxy.A;
+import structer.proxy.AImpl;
+import structer.proxy.AProxy;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -77,5 +86,26 @@ public class Main {
             root = root.children().get(0);
         }
 
+        //decorator
+        TextNode n1 = new SpanNode();
+        TextNode n2 = new BoldDecorator(new SpanNode());
+        n1.setText("hello");
+        n2.setText("hello bold");
+        System.out.println(n1.getText());
+        System.out.println(n2.getText());
+
+        //Facade
+        Facade facade = new Facade();
+        facade.openCompany("test");
+
+        //flyweight
+        Student stu = Student.create(1,"pp");
+        Student stu2 = Student.create(1,"pp");
+
+        //proxy
+        A a = new AImpl(1);
+        AProxy aProxy = new AProxy(a);
+        aProxy.a(1);
+        aProxy.a(2);
     }
 }
