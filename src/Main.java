@@ -1,3 +1,29 @@
+import behavior.chain_of_responsibility.HandlerChain;
+import behavior.chain_of_responsibility.Request;
+import behavior.chain_of_responsibility.impl.CEOHandler;
+import behavior.chain_of_responsibility.impl.DirectorHandler;
+import behavior.chain_of_responsibility.impl.ManagerHandler;
+import behavior.command.AddCommand;
+import behavior.command.Command;
+import behavior.command.TextEditor;
+import behavior.interpreter.Interpreter;
+import behavior.iterator.ReverseArrayCollection;
+import behavior.mediator.ExampleA;
+import behavior.mediator.ExampleB;
+import behavior.mediator.ExampleC;
+import behavior.mediator.Mediator;
+import behavior.memento.Memento;
+import behavior.observer.ProductObserver;
+import behavior.observer.Store;
+import behavior.state.State;
+import behavior.state.StateConvert;
+import behavior.strategy.DiscountContext;
+import behavior.strategy.OverDiscountStrategy;
+import behavior.template.AbstractSetting;
+import behavior.template.LocalSetting;
+import behavior.template.RedisSetting;
+import behavior.visitor.FileStructure;
+import behavior.visitor.JavaFileVisitor;
 import create.abstract_factory.AbstractFactory;
 import create.abstract_factory.HttpDocument;
 import create.abstract_factory.WordDocument;
@@ -24,8 +50,12 @@ import structer.proxy.A;
 import structer.proxy.AImpl;
 import structer.proxy.AProxy;
 
+import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -68,6 +98,7 @@ public class Main {
         Singleton instance2 = Singleton.getInstance();
         System.out.println(instance2.equals(instance1));
 
+        //Structer
         //Adapter
         Callable<Long> callable = new TaskCallable();
         Thread thread = new Thread(new TaskRunnableAdapter(callable));
@@ -107,5 +138,81 @@ public class Main {
         AProxy aProxy = new AProxy(a);
         aProxy.a(1);
         aProxy.a(2);
+
+        //behavior
+        //chain
+        // 构造责任链:
+        HandlerChain chain = new HandlerChain();
+        chain.addHandler(new ManagerHandler());
+        chain.addHandler(new DirectorHandler());
+        chain.addHandler(new CEOHandler());
+        // 处理请求:
+        chain.process(new Request("Bob", new BigDecimal("123.45")));
+        chain.process(new Request("Alice", new BigDecimal("1234.56")));
+        chain.process(new Request("Bill", new BigDecimal("12345.67")));
+        chain.process(new Request("John", new BigDecimal("123456.78")));
+
+        //command
+        TextEditor textEditor = new TextEditor();
+        Command command = new AddCommand(textEditor);
+        command.execute();
+
+        //interpreter
+        Interpreter.log("[{}] start {} at {}...", LocalTime.now().withNano(0), "engine", LocalDate.now());
+
+        //iterator
+        var rArray = new ReverseArrayCollection<String>("apple", "pear", "orange", "banana");
+        for (String fruit : rArray) {
+            System.out.println(fruit);
+        }
+
+        //Mediator
+        ExampleA exampleA = new ExampleA();
+        ExampleB exampleB = new ExampleB();
+        ExampleC exampleC = new ExampleC();
+        Mediator mediator = new Mediator(exampleA,exampleB,exampleC);
+        mediator.testAB();
+
+        //Memento
+        Memento memento = new Memento();
+        memento.add("hello memento");
+        memento.show();
+        memento.getState();
+        memento.setState("reset memento");
+        memento.show();
+
+        // observer
+        ProductObserver testa = new ProductObserver();
+        ProductObserver testc = new ProductObserver();
+        // store:
+        Store store = new Store();
+        // 注册观察者:
+        store.addObserver(testa);
+        store.addObserver(testc);
+        // 添加新商品并通知观察者
+        store.addNewProduct("shopA",100);
+
+        //State
+        StateConvert stateConvert = new StateConvert();
+        System.out.println(stateConvert.chat("hello"));
+        System.out.println(stateConvert.chat("bye"));
+
+        // Strategy
+        DiscountContext ctx = new DiscountContext();
+        // 默认使用普通会员折扣:
+        BigDecimal pay1 = ctx.calculatePrice(BigDecimal.valueOf(105));
+        System.out.println(pay1);
+        // 使用满减折扣:
+        ctx.setStrategy(new OverDiscountStrategy());
+        BigDecimal pay2 = ctx.calculatePrice(BigDecimal.valueOf(105));
+        System.out.println(pay2);
+
+        //template
+        AbstractSetting setting1 = new LocalSetting();
+        AbstractSetting setting2 = new RedisSetting();
+
+        //visitor
+        FileStructure fs = new FileStructure(new File("./src/behavior/visitor"));//不是看main位置决定相对路径，而是看根目录位置
+        fs.handle(new JavaFileVisitor());
     }
 }
